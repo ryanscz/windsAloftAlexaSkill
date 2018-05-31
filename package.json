@@ -1,0 +1,22 @@
+{
+  "name": "windsaloft",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ryanscz/windsAloftAlexaSkill.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ryanscz/windsAloftAlexaSkill/issues"
+  },
+  "homepage": "https://github.com/ryanscz/windsAloftAlexaSkill#readme",
+  "dependencies": {
+    "ask-cli": "^1.3.1"
+  }
+}
