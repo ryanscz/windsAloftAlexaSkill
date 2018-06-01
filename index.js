@@ -2,6 +2,7 @@ const _ = require('lodash')
 const axios = require('axios')
 const cheerio = require('cheerio')
 const { trim } = require('underscore.string')
+const airportCodes = require('./airportCodes')
 
 const fetchPage = async (airportCode = 'PWM') => {
   const url = `http://www.pcprg.com/cgi-bin/windsaloft.cgi?station1=${airportCode}&temps=on`
@@ -9,10 +10,10 @@ const fetchPage = async (airportCode = 'PWM') => {
   return data
 }
 
-fetchPage().then(markup => {
+const scrapePage = (markup) => {
   const $ = cheerio.load(markup)
   const data = []
-  const rows = $('tbody tr').map(function (index, el) {
+  $('tbody tr').each(function (index, el) {
     const altitude = Number($(this).find('td').eq(0).text())
     if (_.isNaN(altitude)) return
 
@@ -29,5 +30,9 @@ fetchPage().then(markup => {
     })
   })
 
-  console.log('data', _.reverse(_.sortBy(data, 'altitude')))
-})
+  return _.reverse(_.sortBy(data, 'altitude'))
+}
+
+fetchPage()
+  .then(scrapePage)
+  .then(console.log)
