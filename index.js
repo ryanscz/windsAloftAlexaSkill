@@ -43,7 +43,9 @@ const phrasify = (data) => {
   return phrase.join(' ')
 }
 
+console.time('duration')
 fetchPage()
   .then(scrapePage)
   .then(phrasify)
   .then(console.log)
+  .then(() => console.timeEnd('duration'))
