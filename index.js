@@ -1,51 +1,125 @@
 const _ = require('lodash')
-const axios = require('axios')
-const cheerio = require('cheerio')
-const { trim } = require('underscore.string')
-const airportCodes = require('./airportCodes')
+const Alexa = require('ask-sdk-core')
+const { getPhrase } = require('./api')
 
-const fetchPage = async (airportCode = 'PWM') => {
-  const url = `http://www.pcprg.com/cgi-bin/windsaloft.cgi?station1=${airportCode}&temps=on`
-  const { data } = await axios.get(url)
-  return data
+const LaunchRequestHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'LaunchRequest'
+  },
+  handle(handlerInput) {
+    const speechText = 'Welcome to the Alexa Skills Kit, you can say hello!'
+
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .reprompt(speechText)
+      .withSimpleCard('Hello World', speechText)
+      .getResponse()
+  },
 }
 
-const scrapePage = (markup) => {
-  const $ = cheerio.load(markup)
-  const data = []
-  $('tbody tr').each(function (index, el) {
-    const altitude = Number($(this).find('td').eq(0).text())
-    if (_.isNaN(altitude)) return
+const HelloWorldIntentHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && handlerInput.requestEnvelope.request.intent.name === 'HelloWorldIntent'
+  },
+  handle(handlerInput) {
+    const speechText = 'Hello World!'
 
-    const imageUrl = $(this).find('td').eq(1).find('img').attr('src')
-    const windDirection = Number(`${imageUrl.replace(/.+(\d.)+\..+/gim, "$1")}0`)
-    const speed = $(this).find('td').eq(2).text()
-    const mph = speed.split('Knots')[1].split(' ')[0]
-    const temp = trim($(this).find('td').eq(3).text()).split(' ')[2]
-
-    data.push({
-      altitude,
-      windDirection,
-      speed: _.round(mph),
-      temp: _.isNaN(Number(temp)) ? null : _.round(temp)
-    })
-  })
-
-  return _.reverse(_.sortBy(data, 'altitude'))
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .withSimpleCard('Hello World', speechText)
+      .getResponse()
+  },
 }
 
-const phrasify = (data) => {
-  const phrase = _.map(data, row => {
-    const { altitude, windDirection, speed, temp } = row
-    const tempPhrase = temp ? `, and is ${temp} degrees` : ''
-    return `At ${altitude} feet, the wind is coming out of ${windDirection} at ${speed} miles per hour${tempPhrase}.`
-  })
-  return phrase.join(' ')
+const HelpIntentHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.HelpIntent'
+  },
+  handle(handlerInput) {
+    const speechText = 'You can say hello to me!'
+
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .reprompt(speechText)
+      .withSimpleCard('Hello World', speechText)
+      .getResponse()
+  },
 }
 
-console.time('duration')
-fetchPage()
-  .then(scrapePage)
-  .then(phrasify)
-  .then(console.log)
-  .then(() => console.timeEnd('duration'))
+const CancelAndStopIntentHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.CancelIntent'
+        || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent')
+  },
+  handle(handlerInput) {
+    const speechText = 'Goodbye!'
+
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .withSimpleCard('Hello World', speechText)
+      .getResponse()
+  },
+}
+
+const SessionEndedRequestHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest'
+  },
+  handle(handlerInput) {
+    console.log(`Session ended with reason: ${handlerInput.requestEnvelope.request.reason}`)
+
+    return handlerInput.responseBuilder.getResponse()
+  },
+}
+
+const ErrorHandler = {
+  canHandle() {
+    return true
+  },
+  handle(handlerInput, error) {
+    console.log(`Error handled: ${error.message}`)
+
+    return handlerInput.responseBuilder
+      .speak('Sorry, I can\'t understand the command. Please say again.')
+      .reprompt('Sorry, I can\'t understand the command. Please say again.')
+      .getResponse()
+  },
+}
+
+const WindReportHandler = {
+  canHandle (input) {
+    return input.requestEnvelope.request.type === 'IntentRequest'
+    && input.requestEnvelope.request.intent.name === 'WindsIntent'
+  },
+  async handle (input) {
+    const dropzone = _.get(input, 'requestEnvelope.request.intent.slots.dropZone.value')
+
+    try {
+      let phrase = await getPhrase(dropzone)
+      console.log('phrase', phrase)
+      return input.responseBuilder
+        .speak(phrase)
+        .withSimpleCard('Wind Report', phrase)
+        .getResponse()
+    } catch (err) {
+      console.log('async error', err.message)
+    }
+  }
+}
+
+const skillBuilder = Alexa.SkillBuilders.custom()
+
+exports.handler = skillBuilder
+  .addRequestHandlers(
+    LaunchRequestHandler,
+    HelloWorldIntentHandler,
+    HelpIntentHandler,
+    CancelAndStopIntentHandler,
+    SessionEndedRequestHandler,
+    WindReportHandler
+  )
+  .addErrorHandlers(ErrorHandler)
+  .lambda()

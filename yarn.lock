@@ -139,6 +139,28 @@ ask-cli@^1.3.1:
     sugar "^2.0.4"
     tmp "0.0.31"
 
+ask-sdk-core@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/ask-sdk-core/-/ask-sdk-core-2.0.5.tgz#4162bf3d6e1c1278c485600478e0d6f9b80eafb3"
+
+ask-sdk-dynamodb-persistence-adapter@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/ask-sdk-dynamodb-persistence-adapter/-/ask-sdk-dynamodb-persistence-adapter-2.0.5.tgz#5ae22ea53c2010141d549903f90c52397d01d465"
+  dependencies:
+    aws-sdk "^2.163.0"
+
+ask-sdk-model@^1.0.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/ask-sdk-model/-/ask-sdk-model-1.3.0.tgz#eba25611f464e2713a83df6d7323d2b9dea564e2"
+
+ask-sdk@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/ask-sdk/-/ask-sdk-2.0.5.tgz#f8f66f992173c1c225e30c305a623df754c5d598"
+  dependencies:
+    ask-sdk-core "^2.0.5"
+    ask-sdk-dynamodb-persistence-adapter "^2.0.5"
+    ask-sdk-model "^1.0.0"
+
 asn1@~0.2.3:
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/asn1/-/asn1-0.2.3.tgz#dac8787713c9966849fc8180777ebe9c1ddf3b86"
@@ -172,6 +194,20 @@ atob@^2.1.1:
 aws-profile-handler@^2.0.1:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/aws-profile-handler/-/aws-profile-handler-2.0.3.tgz#c1547d3183e6267faa409f908da0b5c27e6ecba9"
+
+aws-sdk@^2.163.0:
+  version "2.251.1"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.251.1.tgz#0f7e44b45c227ab7d5c63188c42c6ac913f25bf3"
+  dependencies:
+    buffer "4.9.1"
+    events "1.1.1"
+    ieee754 "1.1.8"
+    jmespath "0.15.0"
+    querystring "0.2.0"
+    sax "1.2.1"
+    url "0.10.3"
+    uuid "3.1.0"
+    xml2js "0.4.17"
 
 aws-sdk@^2.9.0:
   version "2.249.1"
