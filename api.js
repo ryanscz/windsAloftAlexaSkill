@@ -18,7 +18,7 @@ const scrapePage = (markup) => {
     if (_.isNaN(altitude)) return
 
     const imageUrl = $(this).find('td').eq(1).find('img').attr('src')
-    const windDirection = Number(`${imageUrl.replace(/.+(\d.)+\..+/gim, "$1")}0`)
+    const windDirection = Number(`${imageUrl.replace(/.+(\d.)+\..+/gim, '$1')}0`)
     const speed = $(this).find('td').eq(2).text()
     const mph = _.round(speed.split('Knots')[1].split(' ')[0])
     const temp = trim($(this).find('td').eq(3).text()).split(' ')[2]
@@ -34,6 +34,18 @@ const scrapePage = (markup) => {
   return _.reverse(_.sortBy(data, 'altitude'))
 }
 
+const windCompass = (windDirection) => {
+  if ((windDirection >= 0 && windDirection <= 22.5)||(windDirection > 337.5 && windDirection <= 360)) return 'North';
+  if (windDirection > 22.5 && windDirection <= 67.5) return 'North East';
+  if (windDirection > 67.5 && windDirection <= 112.5) return 'East';
+  if (windDirection > 112.5 && windDirection <= 157.5) return 'South East';
+  if (windDirection > 157.5 && windDirection <= 202.5) return 'South';
+  if (windDirection > 202.5 && windDirection <= 247.5) return 'South West';
+  if (windDirection > 247.5 && windDirection <= 290.5) return 'West';
+  if (windDirection > 290.5 && windDirection <= 337.5) return 'North West';
+  
+}
+
 const phrasify = (data) => {
   const phrase = _.map(data, row => {
     const { altitude, windDirection, speed, temp } = row
@@ -42,8 +54,9 @@ const phrasify = (data) => {
       return `At ${altitude} feet, it's wicked slow guy.`
     }
 
-    const tempPhrase = temp ? `, and is ${temp} degrees` : ''
-    return `At ${altitude} feet, the wind is coming out of ${windDirection} at ${speed} miles per hour${tempPhrase}.`
+    const convertWindDirection = windCompass(windDirection)
+    const tempPhrase = temp ? `, and the temperature is ${temp} degrees` : ''
+    return `At ${altitude} feet, the wind is coming out of the ${convertWindDirection} at ${speed} miles per hour${tempPhrase}.`
   })
   return phrase.join(' ')
 }
