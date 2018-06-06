@@ -61,6 +61,23 @@ const getAirportCode = (dropzone) => {
   if (dropzone === 'SNE' || dropzone === 'skydive new england') return 'PWM'
 
   if (dropzone === 'eloy' || dropzone === 'skydive arizona') return 'PHX'
+
+  if (dropzone === 'jumptown' || dropzone === 'jump town') return 'BDL'
+
+  if (dropzone === 'pepperell' || dropzone === 'skydive pepperell') return 'BOS'
+
+  if (dropzone === 'chicago' || dropzone === 'skydive chicago') return 'JOT'
+
+  if (dropzone === 'spaceland' || dropzone === 'skydive spaceland') return 'HOU'
+
+  if (dropzone === 'perris' || dropzone === 'skydive perris') return 'ONT'
+
+  if (dropzone === 'deland' || dropzone === 'skydive deland') return 'MLB'
+
+  if (dropzone === 'ranch' || dropzone === 'skydive the ranch') return 'ALB'
+
+  if (dropzone === 'paraclete' || dropzone === 'skydive paraclete') return 'RDU'
+  
 }
 
 module.exports = { getPhrase }
