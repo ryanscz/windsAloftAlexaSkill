@@ -43,10 +43,9 @@ const windCompass = (windDirection) => {
   if (windDirection > 202.5 && windDirection <= 247.5) return 'South West';
   if (windDirection > 247.5 && windDirection <= 290.5) return 'West';
   if (windDirection > 290.5 && windDirection <= 337.5) return 'North West';
-  
 }
 
-const phrasify = (data) => {
+const phrasify = (data, airportCode) => {
   const phrase = _.map(data, row => {
     const { altitude, windDirection, speed, temp } = row
 
@@ -55,21 +54,29 @@ const phrasify = (data) => {
     }
 
     const convertWindDirection = windCompass(windDirection)
-    const tempPhrase = temp ? `, and the temperature is ${temp} degrees` : ''
-    return `At ${altitude} feet, the wind is coming out of the ${convertWindDirection} at ${speed} miles per hour${tempPhrase}.`
+    return `At ${altitude} feet, the wind is coming out of the ${convertWindDirection} at ${speed} miles per hour.`
   })
-  return phrase.join(' ')
+
+  const dropzone = getDropzoneName(airportCode)
+  return `For ${dropzone}: ${phrase.join(' ')}`
 }
 
 const getPhrase = async (dropzone) => {
   const airportCode = getAirportCode(dropzone)
+
+  if (!airportCode) {
+    return `Sorry, we don't currently support ${dropzone}.`
+  }
+
   const markup = await fetchPage(airportCode)
   const data = await scrapePage(markup)
-  return phrasify(data)
+  return phrasify(data, airportCode)
 }
 
 const getAirportCode = (dropzone) => {
   if (!dropzone) return 'PWM'
+
+  dropzone = _.toLower(dropzone)
 
   if (dropzone === 'SNE' || dropzone === 'skydive new england') return 'PWM'
 
@@ -87,10 +94,27 @@ const getAirportCode = (dropzone) => {
 
   if (dropzone === 'deland' || dropzone === 'skydive deland') return 'MLB'
 
-  if (dropzone === 'ranch' || dropzone === 'skydive the ranch') return 'ALB'
+  if (dropzone === 'ranch' || dropzone === 'the ranch' || dropzone === 'skydive the ranch') return 'ALB'
 
   if (dropzone === 'paraclete' || dropzone === 'skydive paraclete') return 'RDU'
-  
+
+  return undefined
+}
+
+const getDropzoneName = (airportCode) => {
+  switch (airportCode) {
+    case 'PWM': return 'Skydive New England'
+    case 'PHX': return 'Skydive Arizona'
+    case 'BDL': return 'Jump Town'
+    case 'BOS': return 'Skydive Pepperell'
+    case 'JOT': return 'Skydive Chicago'
+    case 'HOU': return 'Skydive Spaceland'
+    case 'ONT': return 'Skydive Perris'
+    case 'MLB': return 'Skydive Deland'
+    case 'ALB': return 'Skydive the Ranch'
+    case 'RDU': return 'Skydive Paraclete'
+    default: return undefined
+  }
 }
 
 module.exports = { getPhrase }
